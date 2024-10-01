@@ -47,7 +47,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ messages, chatName }) => {
     }
   };
 
-  // Automatically scroll to the bottom of the chat
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -70,7 +69,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ messages, chatName }) => {
                 (a, b) =>
                   new Date(a.timestamp).getTime() -
                   new Date(b.timestamp).getTime()
-              ) // Sort messages by timestamp in ascending order
+              )
               .map((msg) => (
                 <div key={msg.id}>
                   <div
@@ -100,7 +99,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ messages, chatName }) => {
                   </p>
                 </div>
               ))}
-            {/* Div used to ensure scroll-to-bottom */}
             <div ref={messagesEndRef} />
           </div>
         )}

@@ -1,4 +1,3 @@
-// Chatcard.tsx
 import React from "react";
 
 interface ChatSessionCardProps {
@@ -33,8 +32,8 @@ const ChatSessionCard: React.FC<ChatSessionCardProps> = ({
 
   return (
     <div
-      className="flex items-center border-t border-gray-300 w-76 p-2 cursor-pointer hover:bg-gray-100"
-      onClick={() => onClick(id)} // Handle click event
+      className="flex items-center border-t border-gray-300 p-2 cursor-pointer hover:bg-gray-100"
+      onClick={() => onClick(id)}
     >
       <div className="flex-shrink-0">
         <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 text-white text-xl">
