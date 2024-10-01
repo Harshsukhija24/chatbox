@@ -2,10 +2,10 @@
 import React from "react";
 
 interface ChatSessionCardProps {
-  id: string; // Added ID prop to identify the session
+  id: string;
   name: string;
   lastMessageTimestamp: string;
-  onClick: (id: string) => void; // Added onClick prop to handle clicks
+  onClick: (id: string) => void;
 }
 
 const ChatSessionCard: React.FC<ChatSessionCardProps> = ({
@@ -14,21 +14,17 @@ const ChatSessionCard: React.FC<ChatSessionCardProps> = ({
   lastMessageTimestamp,
   onClick,
 }) => {
-  // Function to format the timestamp
   const formatTimestamp = (timestamp: string) => {
     const now = new Date();
     const messageTime = new Date(timestamp);
 
-    // If the message is from today
     if (messageTime.toDateString() === now.toDateString()) {
-      // Return the time in "HH:MM" format
       return messageTime.toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
         hour12: false,
       });
     } else {
-      // Return the date in "DD/MM" format
       return `${String(messageTime.getDate()).padStart(2, "0")}/${String(
         messageTime.getMonth() + 1
       ).padStart(2, "0")}`;
@@ -40,7 +36,6 @@ const ChatSessionCard: React.FC<ChatSessionCardProps> = ({
       className="flex items-center border-t border-gray-300 w-76 p-2 cursor-pointer hover:bg-gray-100"
       onClick={() => onClick(id)} // Handle click event
     >
-      {/* Profile Picture with Men Emoji */}
       <div className="flex-shrink-0">
         <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 text-white text-xl">
           👨‍💻

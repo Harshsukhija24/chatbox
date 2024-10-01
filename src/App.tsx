@@ -1,18 +1,17 @@
-// ChatSessions.tsx
 import React, { useEffect, useState, useCallback } from "react";
-import ChatSessionCard from "./components/Chatcard"; // Ensure the path is correct
-import ChatMessages from "./components/Chatbar"; // Import the new ChatMessages component
+import ChatSessionCard from "./components/Chatcard";
+import ChatMessages from "./components/Chatbar";
 
 const ChatSessions: React.FC = () => {
   const [sessions, setSessions] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null); // State to store the selected chat ID
-  const [page, setPage] = useState<number>(1); // State to track the current page
-  const [hasMore, setHasMore] = useState<boolean>(true); // State to track if there are more sessions to load
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const [hasMore, setHasMore] = useState<boolean>(true);
 
   const fetchChatSessions = async (page: number) => {
     const response = await fetch(
-      `https://admin-backend-docker-india-306034828043.asia-south2.run.app/nlp/api/chat_sessions?page=${page}&per_page=10?sort=-timestamp`
+      `https://admin-backend-docker-india-306034828043.asia-south2.run.app/nlp/api/chat_sessions?page=${page}&per_page=10&sort=-timestamp`
     );
     if (!response.ok) {
       throw new Error("Network response was not ok");
@@ -20,49 +19,40 @@ const ChatSessions: React.FC = () => {
     return response.json();
   };
 
-  const loadSessions = async () => {
-    if (loading || !hasMore) return; // Prevent loading if already loading or no more sessions
+  const loadSessions = useCallback(async () => {
+    if (loading || !hasMore) return;
     setLoading(true);
     try {
       const data = await fetchChatSessions(page);
-      // Sort messages for each session by timestamp in descending order
-      const sortedSessions = data.chat_sessions.map((session: any) => {
-        const sortedMessages = session.messages.sort(
-          (a: any, b: any) =>
-            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-        );
-        return { ...session, messages: sortedMessages };
-      });
-
-      setSessions((prevSessions) => [...prevSessions, ...sortedSessions]);
-      setHasMore(data.chat_sessions.length > 0); // Check if more data is available
-      setPage((prevPage) => prevPage + 1); // Increment the page number
+      setSessions((prevSessions) => [...prevSessions, ...data.chat_sessions]);
+      setHasMore(data.chat_sessions.length > 0);
+      setPage((prevPage) => prevPage + 1);
     } catch (error) {
       console.error("Error fetching chat sessions:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, hasMore, loading]);
 
   useEffect(() => {
-    loadSessions(); // Initial load
-  }, []);
+    loadSessions();
+  }, [loadSessions]);
 
   const handleChatClick = (id: string) => {
-    setSelectedChatId(id); // Set the selected chat ID when a card is clicked
+    setSelectedChatId(id);
   };
 
   const selectedSession = sessions.find(
     (session) => session.id === selectedChatId
   );
   const messages = selectedSession ? selectedSession.messages : [];
-  const chatName = selectedSession ? selectedSession.name : ""; // Get the chat name for display
+  const chatName = selectedSession ? selectedSession.name : "";
 
   const handleScroll = useCallback(
     (event: React.UIEvent<HTMLDivElement>) => {
       const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
       if (scrollTop + clientHeight >= scrollHeight - 10 && hasMore) {
-        loadSessions(); // Load more sessions when scrolled to the bottom
+        loadSessions();
       }
     },
     [hasMore, loadSessions]
@@ -73,8 +63,8 @@ const ChatSessions: React.FC = () => {
       <div className="w-80 border-r border-gray-300">
         <h1 className="text-xl font-semibold bg-gray-200 p-4">Messages</h1>
         <div
-          className="bg-white rounded-lg shadow h-[calc(100vh-60px)] overflow-y-auto"
-          onScroll={handleScroll} // Add the scroll event handler
+          className="bg-white rounded-lg shadow h-[calc(100vh-60px)] overflow-y-auto "
+          onScroll={handleScroll}
         >
           {sessions.map((session) => (
             <ChatSessionCard
@@ -82,25 +72,28 @@ const ChatSessions: React.FC = () => {
               id={session.id}
               name={session.name}
               lastMessageTimestamp={
-                session.messages[session.messages.length - 1]?.timestamp
+                session.messages.length > 0
+                  ? session.messages[session.messages.length - 1]?.timestamp
+                  : null
               }
-              onClick={handleChatClick} // Pass the click handler
+              onClick={handleChatClick}
             />
           ))}
           {loading && (
             <p className="text-center py-4">Loading more sessions...</p>
           )}
+          {sessions.length === 0 && !loading && (
+            <p className="text-center py-4">No chat sessions found.</p>
+          )}
         </div>
       </div>
 
       <div className="flex-1 bg-white">
-        {/* Show a message when no chat is selected */}
         {!selectedChatId ? (
           <div className="flex items-center justify-center h-full text-gray-500">
             <p>Select a message to view the conversation</p>
           </div>
         ) : (
-          // Render ChatMessages component on the right side
           <ChatMessages messages={messages} chatName={chatName} />
         )}
       </div>
