@@ -2,13 +2,22 @@ import React, { useEffect, useState, useCallback } from "react";
 import ChatSessionCard from "./components/Chatcard";
 import ChatMessages from "./components/Chatbar";
 
+/**
+ *
+ * usestate-when i have to change data of a component and manupalte that data
+ * redux -when i have change data of something at central /gloabal store that at every componet is should at complete level
+ *
+ *
+ *
+ */
+
 const ChatSessions: React.FC = () => {
   const [sessions, setSessions] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
-
+  /** if response is not ok use seterror and should show user a error */
   const fetchChatSessions = async (page: number) => {
     const response = await fetch(
       `https://admin-backend-docker-india-306034828043.asia-south2.run.app/nlp/api/chat_sessions?page=1&per_page=20`
@@ -19,6 +28,12 @@ const ChatSessions: React.FC = () => {
     return response.json();
   };
 
+  /**
+   *
+   * we use callback hook in session so that i only render when that session when we needs and it is usnig async and promise so it shoul put in that so that until promise return
+   * fix - we will callback hook and settimeout for that
+   *
+   */
   const loadSessions = async () => {
     if (loading || !hasMore) return;
     setLoading(true);
